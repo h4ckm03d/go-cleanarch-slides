@@ -25,6 +25,7 @@ This is additional notes gawe curhat opo gawe sembarang wis
 
 ---
 
+
 <L.Column>
 
 ## Today we'll learn about...
@@ -32,7 +33,7 @@ This is additional notes gawe curhat opo gawe sembarang wis
 <ul>
   <Appear>
     <li>What is clean architecture</li>
-    <li>Charasteritics clean architecture</li>
+    <li>Charasteritics clean of a architecture</li>
     <li>Clean Architecture principles</li>
     <li>Implementing clean architecture with golang</li>
   </Appear>
@@ -41,14 +42,67 @@ This is additional notes gawe curhat opo gawe sembarang wis
 
 ---
 
+<L.Column>
+
+## What is clean architecture?
+
+### The way to organized project
+
+To achieve objective...
+- Easy to understand
+- Easy to change as the project grows
+- Independent from external dependency
+
+This doesn't happen by chance. It takes intentional planning...
+</L.Column>
+
+<Notes>
+Arsitektur disini adalah desain dari sebuah proyek perangkat lunak yang merupakan organisasi kode menjadi sebuah kelas-kelas, berkas-berkas, komponen atau menjadi modul dan bagaimana semua group tersebut berhubungan satu sama lain.
+Arsitektur menentukan dimana aplikasi menjalankan fungsionalitas intinya dan bagaimana fungsionalitas tersebut berinteraksi dengan hal-hal seperti database dan antarmuka pengguna. 
+Dan pada akhirnya Clean architecture mengacu pada bagaimana mengorganisasi sebuah proyek sehingga mudah dipahami dan mudah diubah seiring dengan pertumbuhan proyek. Ini tidak terjadi secara kebetulan. Itu membutuhkan perencanaan yang disengaja.
+</Notes>
+
+---
+
 <Background />
 
 <L.Row>
 <Cereal />
 
-### We've now learned about the GraphQL AST, which will come in handy later...
+### We've now learned about the moon view of clean architecture definition
 
 </L.Row>
+
+---
+
+## Characteristics of a clean architecture
+
+---
+
+<L.Row>
+
+## ugh
+
+import RuwetDependency from '../assets/clean-architecture-ex-1.jpeg';
+
+<img src={RuwetDependency} />
+</L.Row>
+
+<Notes>
+The secret to building a large project that is easy to maintain is this: separating the files or classes into components that can change independently of other components. Let's illustrate that with a couple of images.
+</Notes>
+
+---
+
+<L.Column>
+
+## much better
+
+import StarDependency from '../assets/clean-architecture-ex-2.jpeg';
+
+<img src={StarDependency} />
+
+</L.Column>
 
 ---
 
@@ -65,3 +119,39 @@ fmt.Print("hello worlds")
 ```
 
 </Surfer>
+---
+
+<Background />
+<L.Row>
+
+## SOLID principles
+
+<Cereal />
+</L.Row>
+
+- Single Responsibility Principle (known as SRP)
+- Open/Closed Principle
+- Liskov’s Substitution Principle
+- Interface Segregation Principle
+- Dependency Inversion Principle
+
+---
+
+<FormidableIntro />
+
+More Questions? [@kaptenupi](https://twitter.com/kaptenupi) 
+
+---
+
+<Background />
+<L.Row>
+
+## There's always more that can be done.
+
+<Cereal />
+</L.Row>
+
+- Logging exchange.
+- Support for Subscriptions.
+- Rewriting the Exchange pipeline with streams.
+- Normalised caching.
