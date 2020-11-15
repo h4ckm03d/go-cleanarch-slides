@@ -1,6 +1,16 @@
 /** @jsx jsx */
 import { jsx } from 'theme-ui'
 
+export default ({ children }) => (
+    <div
+      style={{
+        width: '100vw',
+        height: '100vh',
+      }}>
+      {children}
+    </div>
+  )
+
 export const Column = ({ sx, children }) => (
   <div
     sx={{

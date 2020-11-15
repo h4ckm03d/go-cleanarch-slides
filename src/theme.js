@@ -153,7 +153,14 @@ export default {
       '& .cs-container': {
         position: 'static !important'
       }
-    },
+      },
+      metadata: {
+        author: `Josh Dzielak`,
+        twitter: `@dzello`,
+        hashtag: `#JAMstackParis`,
+        date: `May 28, 2019`,
+        repository: `https://github.com/developermode/mdx-talk`
+      },
     h3: {
       fontSize: '26px'
     },
