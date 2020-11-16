@@ -13,15 +13,6 @@ import FormidableIntro from '../assets/formidable-intro.svg';
 
 ## by Moch Lutfi
 </L.Column>
-<Notes>
-This is additional notes gawe curhat opo gawe sembarang wis
-This is additional notes gawe curhat opo gawe sembarang wis
-This is additional notes gawe curhat opo gawe sembarang wis
-This is additional notes gawe curhat opo gawe sembarang wis
-This is additional notes gawe curhat opo gawe sembarang wis
-This is additional notes gawe curhat opo gawe sembarang wis
-This is additional notes gawe curhat opo gawe sembarang wis
-</Notes>
 
 ---
 
@@ -89,7 +80,7 @@ import RuwetDependency from '../assets/clean-architecture-ex-1.jpeg';
 </L.Column>
 
 <Notes>
-The secret to building a large project that is easy to maintain is this: separating the files or classes into components that can change independently of other components. Let's illustrate that with a couple of images.
+Pada gambar di atas, jika Anda ingin mengganti gunting dengan pisau, apa yang harus Anda lakukan? Anda harus melepaskan tali yang ada di pena, botol tinta, selotip, dan kompas. Kemudian Anda harus mengikat kembali barang-barang itu ke pisau. Mungkin itu berhasil untuk pisaunya, tetapi bagaimana jika pena dan selotip mengatakan, "Tunggu, kami membutuhkan gunting." Jadi sekarang pena dan selotip tidak berfungsi dan harus diganti, yang pada gilirannya mempengaruhi objek yang terikat padanya. Ini berantakan.
 </Notes>
 
 ---
@@ -98,27 +89,160 @@ The secret to building a large project that is easy to maintain is this: separat
 
 ## much better
 
-
 import StarDependency from '../assets/clean-architecture-ex-2.jpeg';
 
 <img src={StarDependency} />
+
+<Notes>
+Sekarang bagaimana cara mengganti gunting? Kita hanya perlu mencabut tali gunting dari bawah catatan Post-it dan menambahkan tali baru yang diikat ke pisau. Jauh lebih mudah. Catatan Post-it tidak peduli karena senar itu bahkan tidak terikat padanya.
+
+Arsitektur yang diwakili oleh gambar kedua jelas lebih mudah diubah. Selama catatan Post-it tidak perlu sering diubah, sistem ini akan sangat mudah dipelihara. Konsep yang sama adalah arsitektur yang akan membuat perangkat lunak Anda mudah dipelihara dan diubah.
+</Notes>
 </L.Column>
 
 ---
 
-<Surfer>
 
-```go title="1"
+import DomainLayer from '../assets/clean-architecture-ex-3.png';
 
-fmt.Println()
+<img src={DomainLayer} />
+
+domain layer vs infrastructure
+
+
+<Notes>
+The inner circle is the domain layer of your application. This is where you put the business rules. By "business" we don't necessarily mean a company. It just means the essence of what your application does, the core functionality of the code. A translation app translates. An online store has products to sell. These business rules tend to be fairly stable since you are not likely to change the essence of what your app does very often.
+
+The outer circle is the infrastructure. It includes things like the UI, the database, web APIs, and frameworks. These things are more likely to change than the domain. For example, you are more likely to change how a UI button looks than you are to change how a loan is calculated.
+
+A boundary between the domain and the infrastructure is set up so that the domain doesn't know anything about the infrastructure. That means the UI and the database depend on the business rules, but the business rules don't depend on the UI or database. This makes it a plugin architecture. It doesn't matter if the UI is a web interface, a desktop app, or a mobile app. It doesn't matter if the data is stored using SQL or NoSQL or in the cloud. The domain doesn't care. This makes it easy to change the infrastructure.
+
+</Notes>
+
+---
+
+<L.Row>
+
+## Defining `terms`
+
+### Entities
+
+</L.Row>
+
+import DetailLayer from '../assets/clean-architecture-ex-4.png';
+
+<img src={DetailLayer} />
+
+
+<Notes>
+Here the domain layer is subdivided into *entities* and *use cases*, and an *adapter* layer forms the border between the domain and the infrastructure layer. These terms can be a little confusing. Let's look at them individually.
+</Notes>
+
+---
+
+<L.Row>
+
+## Defining `terms`
+
+### Use cases
+
+</L.Row>
+
+<img src={DetailLayer} />
+
+---
+
+<L.Row>
+
+## Defining `terms`
+
+### Use cases (2)
+
+</L.Row>
+
 ```
+    Gather Info for New Loan
 
-```go title="2"
-fmt.Println()
-fmt.Print("hello worlds")
+    Input:  Name, Address, Birthdate, etc.
+    Output: Same info + credit score
+
+    Rules:
+      1. Validate name
+      2. Validate address, etc.
+      3. Get credit score
+      4. If credit score < 500 activate Denial
+      5. Else create Customer (entity) and activate Loan Estimation
 ```
+<Notes>
+The use cases are the business rules for a specific application. They tell how to automate the system. This determines the behavior of the app. Here is an example from the book of the business rules for a use case (p. 192, somewhat modified):
+</Notes>
 
-</Surfer>
+---
+
+<L.Row>
+
+## Defining `terms`
+
+### Adapters
+
+</L.Row>
+
+<img src={DetailLayer} />
+
+---
+
+<L.Row>
+
+## Defining `terms`
+
+### Adapters (2)
+
+</L.Row>
+
+<img src={DetailLayer} />
+
+---
+
+<L.Row>
+
+## Defining `terms`
+
+### Infrastructure
+
+</L.Row>
+
+<img src={DetailLayer} />
+
+---
+
+<L.Row>
+
+## Defining `terms`
+
+### Infrastructure (2)
+
+</L.Row>
+
+- The User Interface
+- Database
+- Framework
+- Device
+
+Since the things in this layer are so likely to change, they are kept as far away as possible from the more stable domain layers
+
+---
+
+<L.Column>
+
+## Principles for implementing `clean architecture`
+
+- SOLID principles
+- Reuse/Release Equivalence Principle (REP)
+- Common Closure Principle (CCP)
+- Common Reuse Principle (CRP)
+- Acyclic Dependency Principle (ADP)
+
+</L.Column>
 
 ---
 
