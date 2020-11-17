@@ -70,14 +70,14 @@ Dan pada akhirnya Clean architecture mengacu pada bagaimana mengorganisasi sebua
 
 ---
 
-<L.Column>
+<L.Row>
 
 ## ugh
 
 import RuwetDependency from '../assets/clean-architecture-ex-1.jpeg';
 
-<img src={RuwetDependency} />
-</L.Column>
+<img src={RuwetDependency}/>
+</L.Row>
 
 <Notes>
 Pada gambar di atas, jika Anda ingin mengganti gunting dengan pisau, apa yang harus Anda lakukan? Anda harus melepaskan tali yang ada di pena, botol tinta, selotip, dan kompas. Kemudian Anda harus mengikat kembali barang-barang itu ke pisau. Mungkin itu berhasil untuk pisaunya, tetapi bagaimana jika pena dan selotip mengatakan, "Tunggu, kami membutuhkan gunting." Jadi sekarang pena dan selotip tidak berfungsi dan harus diganti, yang pada gilirannya mempengaruhi objek yang terikat padanya. Ini berantakan.
@@ -85,7 +85,7 @@ Pada gambar di atas, jika Anda ingin mengganti gunting dengan pisau, apa yang ha
 
 ---
 
-<L.Column>
+<L.Row>
 
 ## much better
 
@@ -98,10 +98,9 @@ Sekarang bagaimana cara mengganti gunting? Kita hanya perlu mencabut tali guntin
 
 Arsitektur yang diwakili oleh gambar kedua jelas lebih mudah diubah. Selama catatan Post-it tidak perlu sering diubah, sistem ini akan sangat mudah dipelihara. Konsep yang sama adalah arsitektur yang akan membuat perangkat lunak Anda mudah dipelihara dan diubah.
 </Notes>
-</L.Column>
+</L.Row>
 
 ---
-
 
 import DomainLayer from '../assets/clean-architecture-ex-3.png';
 
@@ -133,10 +132,68 @@ import DetailLayer from '../assets/clean-architecture-ex-4.png';
 
 <img src={DetailLayer} />
 
-
 <Notes>
 Here the domain layer is subdivided into *entities* and *use cases*, and an *adapter* layer forms the border between the domain and the infrastructure layer. These terms can be a little confusing. Let's look at them individually.
+The entities know nothing of the other layers. They don't depend on anything. That is, they don't use the names of any other classes or components that are in the outer layers.
 </Notes>
+
+---
+
+<L.Row>
+
+## Defining `terms`
+
+### Entities (2)
+
+</L.Row>
+
+import TodoClass from '../assets/todo.png';
+
+<img src={TodoClass} />
+
+- The entities know nothing of the other layers. 
+- They don't depend on anything.
+---
+
+<Surfer>
+
+```go title="Todo entity"
+// Todo respresent a record stored in todos table.
+type Todo struct {
+	ID        uint      `json:"id"`
+	Title     string    `json:"title"`
+	Order     int       `json:"order"`
+	Completed bool      `json:"completed"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+```
+
+```go title="todo validation"
+
+// Todo respresent a record stored in todos table.
+type Todo struct {
+	ID        uint      `json:"id"`
+	Title     string    `json:"title"`
+	Order     int       `json:"order"`
+	Completed bool      `json:"completed"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// Validate todo.
+func (t Todo) Validate() error {
+	var err error
+	switch {
+	case len(t.Title) == 0:
+		err = ErrTodoTitleBlank
+	}
+
+	return err
+}
+```
+
+</Surfer>
 
 ---
 
@@ -161,21 +218,72 @@ Here the domain layer is subdivided into *entities* and *use cases*, and an *ada
 </L.Row>
 
 ```
-    Gather Info for New Loan
+    Create New Todo Item
 
-    Input:  Name, Address, Birthdate, etc.
-    Output: Same info + credit score
+    Input:  Title, Order, Completed, etc.
+    Output: error info
 
     Rules:
-      1. Validate name
-      2. Validate address, etc.
-      3. Get credit score
-      4. If credit score < 500 activate Denial
-      5. Else create Customer (entity) and activate Loan Estimation
+      1. Validate title
+      2. Validate order, etc.
+      3. If completed then earn score and create todo
+      4. Else create Todo (entity)
 ```
 <Notes>
 The use cases are the business rules for a specific application. They tell how to automate the system. This determines the behavior of the app. Here is an example from the book of the business rules for a use case (p. 192, somewhat modified):
 </Notes>
+
+---
+
+<Surfer>
+
+```go title="declare composite struct to implement Create"
+
+type create struct {
+	repository rel.Repository
+	scores     scores.Service
+}
+
+```
+
+```go title="implement Create todo with validation and update score"
+
+type create struct {
+	repository rel.Repository
+	scores     scores.Service
+}
+
+func (c create) Create(ctx context.Context, todo *Todo) error {
+	if err := todo.Validate(); err != nil {
+		logger.Warn("validation error", zap.Error(err))
+		return err
+	}
+
+	// if completed, then earn a point.
+	if todo.Completed {
+		return c.repository.Transaction(ctx, func(ctx context.Context) error {
+			c.repository.MustInsert(ctx, todo)
+			return c.scores.Earn(ctx, "todo completed", 1)
+		})
+	}
+
+	c.repository.MustInsert(ctx, todo)
+	return nil
+}
+
+
+```
+
+```diff 8:11 title="Validate input"
+```
+
+```diff 13:19 title="earn point and save database if completed"
+```
+
+```diff 21 title="save to database"
+```
+
+</Surfer>
 
 ---
 
@@ -189,17 +297,80 @@ The use cases are the business rules for a specific application. They tell how t
 
 <img src={DetailLayer} />
 
+<Notes>
+The adapters, also called interface adapters, are the translators between the domain and the infrastructure. For example, they take input data from the GUI and repackage it in a form that is convenient for the use cases and entities. Then they take the output from the use cases and entities and repackage it in a form that is convenient for displaying in the GUI or saving in a database.
+</Notes>
+
 ---
 
-<L.Row>
+<Surfer>
 
-## Defining `terms`
+```go
 
-### Adapters (2)
+// Service instance for todo's domain.
+// Any operation done to any of object within this domain should use this service.
+type Service interface {
+	Get(ctx context.Context, todo *Todo, id uint) error
+	Search(ctx context.Context, todos *[]Todo, filter Filter) error
+	Create(ctx context.Context, todo *Todo) error
+	Update(ctx context.Context, todo *Todo, changes rel.Changeset) error
+	Delete(ctx context.Context, todo *Todo)
+	Clear(ctx context.Context)
+}
 
-</L.Row>
+```
 
-<img src={DetailLayer} />
+```go title="beside embeding the struct, you can also declare the function directly on this struct. "
+
+// Service instance for todo's domain.
+// Any operation done to any of object within this domain should use this service.
+type Service interface {
+	Get(ctx context.Context, todo *Todo, id uint) error
+	Search(ctx context.Context, todos *[]Todo, filter Filter) error
+	Create(ctx context.Context, todo *Todo) error
+	Update(ctx context.Context, todo *Todo, changes rel.Changeset) error
+	Delete(ctx context.Context, todo *Todo)
+	Clear(ctx context.Context)
+}
+
+type service struct {
+	get
+	search
+	create
+	update
+	delete
+	clear
+}
+
+```
+
+```go title="make sure all interface already implemented on service"
+
+// Service instance for todo's domain.
+// Any operation done to any of object within this domain should use this service.
+type Service interface {
+	Get(ctx context.Context, todo *Todo, id uint) error
+	Search(ctx context.Context, todos *[]Todo, filter Filter) error
+	Create(ctx context.Context, todo *Todo) error
+	Update(ctx context.Context, todo *Todo, changes rel.Changeset) error
+	Delete(ctx context.Context, todo *Todo)
+	Clear(ctx context.Context)
+}
+
+type service struct {
+	get
+	search
+	create
+	update
+	delete
+	clear
+}
+
+var _ Service = (*service)(nil)
+
+```
+
+</Surfer>
 
 ---
 
@@ -223,7 +394,7 @@ The use cases are the business rules for a specific application. They tell how t
 
 </L.Row>
 
-- The User Interface
+- User Interface
 - Database
 - Framework
 - Device
@@ -241,6 +412,8 @@ Since the things in this layer are so likely to change, they are kept as far awa
 - Common Closure Principle (CCP)
 - Common Reuse Principle (CRP)
 - Acyclic Dependency Principle (ADP)
+- Stable Dependency Principle (SDP)
+- Stable Abstraction Principle (SAP)
 
 </L.Column>
 
