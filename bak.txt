@@ -4485,3 +4485,19 @@ More Questions? [@_philpl](https://twitter.com/_philpl) & [@sofiapoh](https://tw
 - Support for Subscriptions.
 - Rewriting the Exchange pipeline with streams.
 - Normalised caching.
+
+<L.Row>
+
+## Bonus Exercise
+
+### Make a dependency graph
+
+</L.Row>
+
+- Where are your business rules (entities and use cases)?
+- Do your business rules depend on anything else?
+- How many classes or components would it affect if you had to use a different database? UI platform? Framework?
+- Are there any dependency cycles?
+- What refactoring do you need to do in order to create a plugin architecture?
+
+---

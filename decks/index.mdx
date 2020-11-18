@@ -855,7 +855,96 @@ func NewDataStore() Datastore{
 
 <L.Row>
 
+## Domain Layer
+
+### Generate mock interface
+
+</L.Row>
+
+```
+
+//go:generate mockery --name Service 
+// --case=underscore --output todostest --outpkg todostest
+
+// Service instance for todo's domain.
+// Any operation done to any of object within this domain should use this service.
+type Service interface {
+   ...
+}
+```
+
+---
+
+<Surfer>
+
+```go title="simplify mock"
+
+// MockFunc function.
+type MockFunc func(service *Service)
+
+```
+
+```go title="add applier to register all mock"
+
+// MockFunc function.
+type MockFunc func(service *Service)
+
+// Mock apply mock todo functions.
+func Mock(service *Service, funcs ...MockFunc) {
+	for i := range funcs {
+		if funcs[i] != nil {
+			funcs[i](service)
+		}
+	}
+}
+
+```
+
+```go title="create short func to mock Create"
+
+// MockFunc function.
+type MockFunc func(service *Service)
+
+// Mock apply mock todo functions.
+func Mock(service *Service, funcs ...MockFunc) {
+	for i := range funcs {
+		if funcs[i] != nil {
+			funcs[i](service)
+		}
+	}
+}
+
+// MockCreate util for Create(ctx context.Context, todo *Todo) error
+func MockCreate(result todos.Todo, err error) MockFunc {
+	return func(service *Service) {
+		service.On("Create", mock.Anything, mock.Anything).
+			Return(func(ctx context.Context, out *todos.Todo) error {
+				*out = result
+				return err
+			})
+	}
+}
+
+```
+
+</Surfer>
+
+---
+
+<L.Row>
+
 ## Database access layer
+
+</L.Row>
+
+<L.Row>
+
+```go
+type search struct {
+	repository rel.Repository
+}
+
+```
 
 import RelImg from '../assets/rel.png';
 
@@ -904,21 +993,6 @@ https://go-rel.github.io/
 
 ---
 
-<L.Row>
-
-## Bonus Exercise
-
-### Make a dependency graph
-
-</L.Row>
-
-- Where are your business rules (entities and use cases)?
-- Do your business rules depend on anything else?
-- How many classes or components would it affect if you had to use a different database? UI platform? Framework?
-- Are there any dependency cycles?
-- What refactoring do you need to do in order to create a plugin architecture?
-
----
 
 <L.Row>
 
