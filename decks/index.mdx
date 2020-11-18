@@ -435,6 +435,283 @@ Since the things in this layer are so likely to change, they are kept as far awa
 
 ---
 
+<L.Row>
+
+## Single Responsibility Principle
+
+### A class should have one, and only one, reason to change. (Robert C Martin)
+
+</L.Row>
+
+
+
+- Is my method a behavior of my struct ?
+- Is my struct tightly coupled with another struct ?
+- Could my method be applied differently ?
+
+<Notes>
+As Dave Cheney says :
+The Single Responsibility Principle encourages you to structure the functions, types, and methods into packages that exhibit natural cohesion; the types belong together, the functions serve a single purpose.
+</Notes>
+
+---
+
+<Notes>"Could I “Save” my struct in another location ? Maybe tomorrow I would like to save in a file, or in a DataBase."</Notes>
+<Surfer>
+
+```go title="Could my method be applied differently ?"
+
+type A struct {
+    Content string
+    ....
+}
+func (a A) Save() {
+ fmt.Println("Saving in the Terminal .... " + a.Content)
+}
+
+```
+
+```go title="So the code should be"
+
+type A struct {
+    Content string
+    .....
+}
+type APersistence struct {
+}
+func (ap APersistence) Save(a A) {
+    fmt.Println("Saving in the Terminal .... " + a.Content)
+}
+
+```
+
+</Surfer>
+
+---
+
+<L.Row>
+
+## Open/Closed Principle
+
+###  Software entities should be open for extension, but closed for modification - Bertrand Meyer
+
+</L.Row>
+
+- be able to override a struct
+
+---
+
+<Surfer>
+
+```go title="Be able to override a struct"
+package main
+
+type A struct {
+        year int
+}
+
+func (a A) Greet() { fmt.Println("Hello Technology", a.year) }
+
+type B struct { A }
+
+func (b B) Greet() { fmt.Println("Welcome to Bukalapak", b.year) }
+
+func main() {
+        var a A
+        a.year = 2020
+        var b B
+        b.year = 2020
+        a.Greet() // Hello Technology 2020
+        b.Greet() // Welcome to Bukalapak 2020
+}
+
+```
+
+```go
+package main
+
+type Cat struct {
+        Name string
+}
+
+func (c Cat) Legs() int { return 4 }
+
+func (c Cat) PrintLegs() {
+        fmt.Printf("I have %d legs\n", c.Legs())
+}
+
+type OctoCat struct {
+        Cat
+}
+
+func (o OctoCat) Legs() int { return 5 }
+
+func main() {
+        var octo OctoCat
+        fmt.Println(octo.Legs()) // 5
+        octo.PrintLegs()         // I have 4 legs
+}
+```
+
+```go
+
+package main
+
+type Cat struct {
+        Name string
+}
+
+func (c Cat) Legs() int { return 4 }
+
+func (c Cat) PrintLegs() {
+        fmt.Printf("I have %d legs\n", c.Legs())
+}
+
+type OctoCat struct {
+        Cat
+}
+
+func (o OctoCat) Legs() int { return 5 }
+
+func main() {
+        var octo OctoCat
+        fmt.Println(octo.Legs()) // 5
+        octo.PrintLegs()         // I have 4 legs
+}
+func PrintLegs(c Cat) {
+        fmt.Printf("I have %d legs\n", c.Legs())
+}
+```
+
+
+</Surfer>
+
+---
+
+<L.Row>
+
+## Liskov’s Substitution Principle
+
+### Subtypes must be substitutable for their base types. (Robert C. Martin)
+
+</L.Row>
+
+<Notes>
+According to that definition golang is safe from LSP, because in golang we don’t have inherintance, we have a more powerful tool that is the composition.
+Anyway composition does not allow to substitute parent struct by child struct.
+</Notes>
+
+---
+
+<Surfer>
+
+```go title="will panic"
+
+type A struct {}
+
+func (a A) Test() {
+     fmt.Println("Printing A")
+}
+
+type B struct { A }
+
+func ImpossibleLiskovSubstitution(a A) {
+    a.Test()
+}
+
+func main() {
+   a := B{}
+   ImpossibleLiskovSubstitution(a) 
+   // PANIC : cannot use a (type B) as type A in argument to ImpossibleLiskovSubstitution
+}
+
+```
+
+```go title="pass interface in the args"
+
+type A struct {}
+
+type tester interface {
+    Test()
+}
+
+func (a A) Test() {
+     fmt.Println("Printing A")
+}
+type B struct { A }
+
+func PossibleLiskovSubstitution(a tester) {
+    a.Test()
+}
+
+func main() {
+   a := B{}
+   PossibleLiskovSubstitution(a)
+}
+
+```
+
+</Surfer>
+
+---
+
+<L.Row>
+
+## Interface Segregation Principle
+
+### Clients should not be forced to depend on methods they do not use. (Robert C. Martin)
+
+</L.Row>
+
+--- 
+
+<Surfer>
+
+```go
+
+// Save writes the contents of doc to the file f.
+func Save(f *os.File, doc *Document) error
+
+```
+
+```go
+
+// Save writes the contents of doc to the supplied ReadWriterCloser.
+func Save(rwc io.ReadWriteCloser, doc *Document) error
+
+```
+
+```go 
+
+// Save writes the contents of doc to the supplied WriteCloser.
+func Save(wc io.WriteCloser, doc *Document) error
+
+```
+
+```go
+
+// Save writes the contents of doc to the supplied Writer.
+func Save(w io.Writer, doc *Document) error
+
+```
+
+</Surfer>
+
+---
+
+<L.Column>
+
+## Dependency Inversion Principle
+
+### High-level modules should not depend on low-level modules. Both should depend on abstractions.
+Abstractions should not depend on details. Details should depend on abstractions.
+–Robert C. Martin
+
+</L.Column>
+
+---
+
+
 <FormidableIntro />
 
 More Questions? [@kaptenupi](https://twitter.com/kaptenupi) 
