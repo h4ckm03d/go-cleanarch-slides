@@ -26,7 +26,7 @@ import FormidableIntro from '../assets/formidable-intro.svg';
     <li>What is clean architecture</li>
     <li>Charasteritics clean of a architecture</li>
     <li>Clean Architecture principles</li>
-    <li>Implementing clean architecture with golang</li>
+    <li>Implementation using golang</li>
   </Appear>
 </ul>
 </L.Column>
@@ -37,7 +37,7 @@ import FormidableIntro from '../assets/formidable-intro.svg';
 
 ## What is clean architecture?
 
-### The way to organized project
+### The way to organizing the project
 
 To achieve objective...
 - Easy to understand
@@ -659,7 +659,7 @@ func main() {
 
 ## Interface Segregation Principle
 
-### Clients should not be forced to depend on methods they do not use. (Robert C. Martin)
+### "Clients should not be forced to depend on methods they do not use" — Robert C. Martin
 
 </L.Row>
 
@@ -670,6 +670,17 @@ func main() {
 ```go
 
 // Save writes the contents of doc to the file f.
+// type File
+//     func Create(name string) (*File, error)
+//     func NewFile(fd uintptr, name string) *File
+//     func Open(name string) (*File, error)
+//     func OpenFile(name string, flag int, perm FileMode) (*File, error)
+//     func (f *File) Chdir() error
+//     func (f *File) Chmod(mode FileMode) error
+//     func (f *File) Chown(uid, gid int) error
+//     func (f *File) Close() error
+//     func (f *File) Fd() uintptr
+//     ...
 func Save(f *os.File, doc *Document) error
 
 ```
@@ -677,13 +688,23 @@ func Save(f *os.File, doc *Document) error
 ```go
 
 // Save writes the contents of doc to the supplied ReadWriterCloser.
+// type ReadWriteCloser interface {
+//    Reader
+//    Writer
+//    Closer
+// }
 func Save(rwc io.ReadWriteCloser, doc *Document) error
 
 ```
 
-```go 
+```go title="no need Read file, it should be on the other method to read and validate files to satisfy SRP"
 
 // Save writes the contents of doc to the supplied WriteCloser.
+// type WriteCloser interface {
+//    Reader
+//    Writer
+//    Closer
+// }
 func Save(wc io.WriteCloser, doc *Document) error
 
 ```
@@ -691,7 +712,68 @@ func Save(wc io.WriteCloser, doc *Document) error
 ```go
 
 // Save writes the contents of doc to the supplied Writer.
+// type Write interface {
+//    Writer
+// }
 func Save(w io.Writer, doc *Document) error
+
+```
+
+</Surfer>
+
+---
+
+<L.Row>
+
+## Dependency Inversion Principle
+
+### “Depend upon Abstractions. Do not depend upon concretions” — Robert C. Martin
+
+</L.Row>
+
+---
+
+<Surfer>
+
+```go title="abstract vs concrete"
+
+type Datastore interface{
+    Store(data interface{})(int, error)
+    Fetch(id int) interface{}
+}
+
+type myDataStore struct {}
+
+func(m myDataStore) Store(data interface{})(int, error){
+    ...
+}
+
+func(m myDataStore) Fetch(id int) interface{}{
+    ...
+}
+
+```
+
+```go 
+
+type Datastore interface{
+    Store(data interface{})(int, error)
+    Fetch(id int) interface{}
+}
+
+type myDataStore struct {}
+
+func(m myDataStore) Store(data interface{})(int, error){
+    ...
+}
+
+func(m myDataStore) Fetch(id int) interface{}{
+    ...
+}
+
+func NewDataStore() Datastore{
+    return myDataStore{}
+}
 
 ```
 
@@ -701,18 +783,153 @@ func Save(w io.Writer, doc *Document) error
 
 <L.Column>
 
-## Dependency Inversion Principle
+## Wrap it all together
 
-### High-level modules should not depend on low-level modules. Both should depend on abstractions.
-Abstractions should not depend on details. Details should depend on abstractions.
-–Robert C. Martin
+</L.Column>
+
+- Project Structure
+- Domain Layer
+- Infrastructure Layer
+
+---
+
+<L.Row>
+
+## Project Structure
+
+</L.Row>
+
+```
+
+.
+├── api
+├── cmd
+│   ├── api
+│   │   └── main.go
+│   └── [other cmd]
+│       └── main.go
+├── todos
+│   ├── todo.go
+│   ├── create.go
+│   ├── update.go
+│   ├── delete.go
+│   ├── service.go
+│   └── todostest
+│       ├── todo.go
+│       └── service.go
+├── [other domain]
+
+```
+
+---
+
+<L.Row>
+
+## Domain Layer
+
+
+```
+
+.
+├── todos
+│   ├── todo.go
+│   ├── create.go
+│   ├── update.go
+│   ├── delete.go
+│   ├── service.go
+│   └── todostest
+│       ├── todo.go
+│       └── service.go
+
+```
+
+- `service.go` as adapter domain, and using `rel` as db access layer
+- `todo.go` as entity
+- `create.go`, `delete.go`, `update.go` as use case
+
+</L.Row>
+
+- generate mock test using https://github.com/vektra/mockery
+
+---
+
+<L.Row>
+
+## Database access layer
+
+import RelImg from '../assets/rel.png';
+
+<img src={RelImg}/>
+</L.Row>
+
+https://go-rel.github.io/
+
+---
+
+<L.Row>
+
+## Infrastructure Layer
+
+</L.Row>
+
+```
+.
+├── api
+│   ├── handler
+│   │   ├── todos.go
+│   │   └── [other handler].go
+│   └── middleware
+│       └── [other middleware].go
+├── grpc
+├── other UI
+
+```
+
+---
+
+<L.Column>
+
+## Takeaways
+
+<ul>
+  <Appear>
+    <li>Dividing components by use cases</li>
+    <li>Only add complexity as you need it</li>
+    <li>When starting a project you should work on the business rules first</li>
+    <li>Get out and start putting these lessons into practice</li>
+  </Appear>
+</ul>
 
 </L.Column>
 
 ---
 
+<L.Row>
 
-<FormidableIntro />
+## Bonus Exercise
 
-More Questions? [@kaptenupi](https://twitter.com/kaptenupi) 
+### Make a dependency graph
 
+</L.Row>
+
+- Where are your business rules (entities and use cases)?
+- Do your business rules depend on anything else?
+- How many classes or components would it affect if you had to use a different database? UI platform? Framework?
+- Are there any dependency cycles?
+- What refactoring do you need to do in order to create a plugin architecture?
+
+---
+
+<L.Row>
+
+# Any Questions?
+
+</L.Row>
+
+---
+
+<L.Row>
+
+# Thank you
+
+</L.Row>
