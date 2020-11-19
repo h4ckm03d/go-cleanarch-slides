@@ -55,17 +55,6 @@ Dan pada akhirnya Clean architecture mengacu pada bagaimana mengorganisasi sebua
 
 ---
 
-<Background />
-
-<L.Row>
-<Cereal />
-
-### We've now learned about the moon view of clean architecture definition
-
-</L.Row>
-
----
-
 ## Characteristics of a clean architecture
 
 ---
@@ -419,19 +408,17 @@ Since the things in this layer are so likely to change, they are kept as far awa
 
 ---
 
-<Background />
 <L.Row>
 
-## SOLID principles
+## `SOLID` principles
 
-<Cereal />
 </L.Row>
 
-- Single Responsibility Principle (known as SRP)
-- Open/Closed Principle
-- Liskov’s Substitution Principle
-- Interface Segregation Principle
-- Dependency Inversion Principle
+- *S*ingle Responsibility Principle (known as SRP)
+- *O*pen/Closed Principle
+- *L*iskov’s Substitution Principle
+- *I*nterface Segregation Principle
+- *D*ependency Inversion Principle
 
 ---
 
@@ -498,6 +485,11 @@ func (ap APersistence) Save(a A) {
 </L.Row>
 
 - be able to override a struct
+- add functionality without modify existing functionality
+
+<Notes>
+This is the O of SOLID. Open means open for extension. Closed means closed for modification. So you should be able to add functionality to a class or component, but you shouldn't need to modify existing functionality. How do you do that? You make sure that every class or component has just one responsibility and then you hide the more stable classes behind interfaces so that they won't be affected when less stable classes have to change.
+</Notes>
 
 ---
 
@@ -527,7 +519,23 @@ func main() {
 
 ```
 
-```go
+```go title="another example"
+package main
+
+type Cat struct {
+        Name string
+}
+
+func (c Cat) Legs() int { return 4 }
+
+func (c Cat) PrintLegs() {
+        fmt.Printf("I have %d legs\n", c.Legs())
+}
+
+```
+
+```go title="beware of the different function receiver"
+
 package main
 
 type Cat struct {
@@ -549,40 +557,10 @@ func (o OctoCat) Legs() int { return 5 }
 func main() {
         var octo OctoCat
         fmt.Println(octo.Legs()) // 5
-        octo.PrintLegs()         // I have 4 legs
+        octo.PrintLegs()           // I have 4 legs
 }
+
 ```
-
-```go
-
-package main
-
-type Cat struct {
-        Name string
-}
-
-func (c Cat) Legs() int { return 4 }
-
-func (c Cat) PrintLegs() {
-        fmt.Printf("I have %d legs\n", c.Legs())
-}
-
-type OctoCat struct {
-        Cat
-}
-
-func (o OctoCat) Legs() int { return 5 }
-
-func main() {
-        var octo OctoCat
-        fmt.Println(octo.Legs()) // 5
-        octo.PrintLegs()         // I have 4 legs
-}
-func PrintLegs(c Cat) {
-        fmt.Printf("I have %d legs\n", c.Legs())
-}
-```
-
 
 </Surfer>
 
