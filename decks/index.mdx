@@ -918,6 +918,14 @@ func MockCreate(result todos.Todo, err error) MockFunc {
 
 ```
 
+```go title="apply multiple mock in one go"
+
+todos := &todostest.Service{}
+
+todostest.Mock(todos, MockCreate, MockSearch, MockDestroy)
+
+```
+
 </Surfer>
 
 ---
