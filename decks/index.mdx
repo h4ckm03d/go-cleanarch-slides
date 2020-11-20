@@ -11,7 +11,7 @@ import FormidableIntro from '../assets/formidable-intro.svg';
 
 # Clean Architecture using golang
 
-## by Moch Lutfi
+## by `Moch Lutfi`
 </L.Column>
 
 ---
@@ -155,6 +155,11 @@ import TodoClass from '../assets/todo.png';
 
 - The entities know nothing of the other layers. 
 - They don't depend on anything.
+
+<Notes>
+Entitas adalah sekumpulan aturan bisnis terkait yang sangat penting untuk fungsi aplikasi. Dalam bahasa pemrograman berorientasi objek, aturan untuk suatu entitas akan dikelompokkan bersama sebagai metode di kelas.
+</Notes>
+
 ---
 
 <Surfer>
@@ -226,10 +231,9 @@ func (t Todo) Validate() error {
     Output: error info
 
     Rules:
-      1. Validate title
-      2. Validate order, etc.
-      3. If completed then earn score and create todo
-      4. Else create Todo (entity)
+      1. Validate title, etc
+      2. If completed then earn score and create Todo
+      3. Else create Todo (entity)
 ```
 <Notes>
 The use cases are the business rules for a specific application. They tell how to automate the system. This determines the behavior of the app. Here is an example from the book of the business rules for a use case (p. 192, somewhat modified):
@@ -692,7 +696,6 @@ func Save(rwc io.ReadWriteCloser, doc *Document) error
 
 // Save writes the contents of doc to the supplied WriteCloser.
 // type WriteCloser interface {
-//    Reader
 //    Writer
 //    Closer
 // }
@@ -703,8 +706,8 @@ func Save(wc io.WriteCloser, doc *Document) error
 ```go
 
 // Save writes the contents of doc to the supplied Writer.
-// type Write interface {
-//    Writer
+// type Writer interface {
+//    Write(p []byte) (n int, err error)
 // }
 func Save(w io.Writer, doc *Document) error
 
@@ -822,6 +825,7 @@ func NewDataStore() Datastore{
 ```
 
 .
+├── scores
 ├── todos
 │   ├── todo.go
 │   ├── create.go
@@ -922,7 +926,9 @@ func MockCreate(result todos.Todo, err error) MockFunc {
 
 todos := &todostest.Service{}
 
-todostest.Mock(todos, MockCreate, MockSearch, MockDestroy)
+todos1 := todos.Todo{ID: 1, Title: "Sleep"}
+
+todostest.Mock(todos, todostest.MockCreate(todos1, nil))
 
 ```
 
