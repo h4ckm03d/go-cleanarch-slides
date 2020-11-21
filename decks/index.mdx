@@ -11,7 +11,7 @@ import FormidableIntro from '../assets/formidable-intro.svg';
 
 # Clean Architecture using golang
 
-## by `Moch Lutfi`
+## by `Moch Lutfi` 
 </L.Column>
 
 ---
@@ -228,6 +228,10 @@ func (t Todo) Validate() error {
 
 <img src={DetailLayer} />
 
+<Notes>
+The use cases are the business rules for a specific application. They tell how to automate the system. This determines the behavior of the app.
+</Notes>
+
 ---
 
 <L.Row>
@@ -250,7 +254,7 @@ func (t Todo) Validate() error {
       3. Else create Todo (entity)
 ```
 <Notes>
-The use cases are the business rules for a specific application. They tell how to automate the system. This determines the behavior of the app. Here is an example from the book of the business rules for a use case (p. 192, somewhat modified):
+The use cases interact with and depend on the entities, but they know nothing about the layers further out. They don't care if it's a web page or an iPhone app. They don't care if the data is stored in the cloud or in a local SQLite database.
 </Notes>
 
 ---
@@ -785,6 +789,7 @@ func NewDataStore() Datastore{
 
 ```
 
+
 </Surfer>
 
 ---
@@ -1113,6 +1118,8 @@ func main() {
 
 # Any Questions?
 
+More Questions? [@kaptenupi](https://twitter.com/kaptenupi) `t.me/kaptenupi`
+
 </L.Row>
 
 ---
@@ -1122,3 +1129,7 @@ func main() {
 # Thank you
 
 </L.Row>
+
+---
+
+git clone https://github.com/h4ckm03d/go-todo-cleanarch
