@@ -68,6 +68,20 @@ Dan pada akhirnya Clean architecture mengacu pada bagaimana mengorganisasi sebua
 
 ---
 
+## Reference
+
+<L.Row>
+
+import CAImage from '../assets/cleanarch.jpg';
+import CCImage from '../assets/cleancode.jpg';
+
+<img src={CAImage}/>
+<img src={CCImage}/>
+
+</L.Row>
+
+---
+
 ## Characteristics of a clean architecture
 
 ---
@@ -969,15 +983,111 @@ https://go-rel.github.io/
 ```
 .
 ├── api
+│   ├── api.go
 │   ├── handler
 │   │   ├── todos.go
 │   │   └── [other handler].go
 │   └── middleware
 │       └── [other middleware].go
-├── grpc
-├── other UI
 
 ```
+
+---
+
+<Surfer>
+
+```go
+
+// NewMux api.
+func NewMux(repository rel.Repository) *chi.Mux {
+	var (
+		mux            = chi.NewMux()
+		scores         = scores.New(repository)
+		todos          = todos.New(repository, scores)
+		healthzHandler = handler.NewHealthz()
+		todosHandler   = handler.NewTodos(repository, todos)
+		scoreHandler   = handler.NewScore(repository)
+	)
+
+```
+
+```go title="add middleware"
+
+// NewMux api.
+func NewMux(repository rel.Repository) *chi.Mux {
+	var (
+		mux            = chi.NewMux()
+		scores         = scores.New(repository)
+		todos          = todos.New(repository, scores)
+		healthzHandler = handler.NewHealthz()
+		todosHandler   = handler.NewTodos(repository, todos)
+		scoreHandler   = handler.NewScore(repository)
+	)
+
+	healthzHandler.Add("database", repository)
+	mux.Use(chimid.RequestID)
+	mux.Use(chimid.RealIP)
+	mux.Use(chimid.Recoverer)
+	mux.Use(cors.AllowAll().Handler)
+
+```
+
+```go title="mount handler to endpoint"
+
+// NewMux api.
+func NewMux(repository rel.Repository) *chi.Mux {
+	var (
+		mux            = chi.NewMux()
+		scores         = scores.New(repository)
+		todos          = todos.New(repository, scores)
+		healthzHandler = handler.NewHealthz()
+		todosHandler   = handler.NewTodos(repository, todos)
+		scoreHandler   = handler.NewScore(repository)
+	)
+
+	healthzHandler.Add("database", repository)
+	mux.Use(chimid.RequestID)
+	mux.Use(chimid.RealIP)
+	mux.Use(chimid.Recoverer)
+	mux.Use(cors.AllowAll().Handler)
+
+	mux.Mount("/healthz", healthzHandler)
+	mux.Mount("/todos", todosHandler)
+	mux.Mount("/score", scoreHandler)
+
+	return mux
+}
+
+```
+
+```go title="main func"
+
+func main() {
+	var (
+		ctx        = context.Background()
+		port       = os.Getenv("PORT")
+		repository = initRepository()
+		mux        = api.NewMux(repository)
+		server     = http.Server{
+			Addr:    ":" + port,
+			Handler: mux,
+		}
+		shutdown = make(chan struct{})
+	)
+
+	go gracefulShutdown(ctx, &server, shutdown)
+
+	logger.Info("server starting: http://localhost" + server.Addr)
+	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+		logger.Fatal("server error", zap.Error(err))
+	}
+
+	<-shutdown
+}
+
+```
+
+</Surfer>
 
 ---
 
