@@ -511,6 +511,90 @@ func (ap APersistence) Save(a A) {
 
 ---
 
+<Surfer>
+
+```go title="Why this snippet is violating SRP?"
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type circle struct {
+	radius float64
+}
+
+func (c circle) area() {
+	// violating Single Responsibility Principle
+	fmt.Printf("circle area: %f\n", math.Pi*c.radius*c.radius)
+}
+
+func main() {
+
+	c := circle{
+		radius: 3,
+	}
+	c.area()
+
+}
+```
+
+```go 2,7 title="It would be a bad design to couple two things that change for different reasons at different times."
+
+func (c circle) area() {
+	// violating Single Responsibility Principle
+	// Because it can change for two reasons. 
+	// 1. the calculation of the area could change for some reason. 
+	// 2. the presentation format of output could also change.
+	fmt.Printf("circle area: %f\n", math.Pi*c.radius*c.radius)
+}
+
+```
+
+</Surfer>
+
+---
+
+import RefactorSRP from '../assets/refactor_srp.jpeg';
+
+
+<L.Row>
+
+## How to do Refactor?
+
+<img src={RefactorSRP}/>
+
+</L.Row>
+
+---
+
+<Surfer>
+
+```go 10:20 file=../code/srp.go
+
+```
+
+```go 22:32 file=../code/srp.go
+
+```
+
+```go 34:37 file=../code/srp.go
+
+```
+
+```go 39:59 file=../code/srp.go
+
+```
+
+```go 61:77 file=../code/srp.go
+
+```
+
+</Surfer>
+
+---
+
 <L.Row>
 
 ## Open/Closed Principle
@@ -541,7 +625,7 @@ func (a A) Greet() { fmt.Println("Hello Technology", a.year) }
 
 type B struct { A }
 
-func (b B) Greet() { fmt.Println("Welcome to Bukalapak", b.year) }
+func (b B) Greet() { fmt.Println("Welcome to the World", b.year) }
 
 func main() {
         var a A
@@ -549,7 +633,7 @@ func main() {
         var b B
         b.year = 2020
         a.Greet() // Hello Technology 2020
-        b.Greet() // Welcome to Bukalapak 2020
+        b.Greet() // Welcome to World 2020
 }
 
 ```
